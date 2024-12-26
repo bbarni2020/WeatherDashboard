@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            color: white;
+            overflow: hidden;
+            transition: background 0.5s ease;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+
+        /* Container styling */
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-in-out;
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        /* Header styling */
+        h1 {
+            margin-bottom: 20px;
+            font-size: 3em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Input field styling */
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+        }
+
+        /* Focus state for input field */
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Button styling */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0072ff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Hover state for button */
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        /* Weather widget styling */
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            position: relative;
+            animation: slideIn 0.5s ease-in-out;
+            flex: 1 1 calc(30% - 20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Weather icon styling */
+        .weather-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        /* Delete button styling */
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Suggestions dropdown styling */
+        .suggestions {
+            background: white;
+            color: black;
+            border-radius: 5px;
+            max-width: 300px;
+            margin: 0 auto;
+            position: absolute;
+            z-index: 10;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Suggestion item styling */
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        /* Hover state for suggestion item */
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Slide in animation */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Weather widgets container styling */
+        .weather-widgets-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        /* Clock styling */
+        .clock {
+            font-size: 6em;
+            margin: 20px 0;
+            display: none;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: white;
+            letter-spacing: 2px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Switch styling */
+        .switch {
+            margin: 20px 0;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        /* Input styling inside switch */
+        .switch input {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Dashboard</h1>
+        <input type="text" id="city" placeholder="Enter city name">
+        <div id="suggestions" class="suggestions"></div>
+        <button id="getWeather">Add Weather Widget</button>
+        <div class="weather-widgets-container" id="weatherWidgets"></div>
+        
+        <div class="switch">
+            <label>
+                Show Clock
+                <input type="checkbox" id="clockSwitch">
+            </label>
+        </div>
+        <div class="clock" id="clock"></div>
+    </div>
+
+    <script>
+    // Constants for API keys
+    const apiKey = '0c35eec34f6079ba7eb5c75044f44bc8'; // Replace with your OpenWeatherMap API key
+    const geonamesUsername = 'forhacker'; // Replace with your Geonames username
+
+    // Event listener for initial setup
+    document.addEventListener('DOMContentLoaded', () => {
+        setBackgroundBasedOnTime();
+        startClock(); // Start the clock when the page loads
+
+        // Toggle clock visibility based on switch
+        document.getElementById('clockSwitch').addEventListener('change', function() {
+            const clock = document.getElementById('clock');
+            clock.style.display = this.checked ? 'block' : 'none';
+        });
+    });
+
+    // Event listener for fetching weather data
+    document.getElementById('getWeather').addEventListener('click', function() {
+        const city = document.getElementById('city').value;
+        if (city) {
+            getWeather(city);
+        }
+    });
+
+    // Event listener for city input field
+    document.getElementById('city').addEventListener('input', function() {
+        const query = this.value;
+        if (query.length > 2) {
+            fetchCitySuggestions(query);
+        } else {
+            document.getElementById('suggestions').style.display = 'none';
+        }
+    });
+
+    /**
+     * Sets background based on the time of day.
+     */
+    function setBackgroundBasedOnTime() {
+        const hour = new Date().getHours();
+        const body = document.body;
+
+        if (hour >= 6 && hour < 12) {
+            body.style.background = 'linear-gradient(to right, #ff7e5f, #feb47b)'; // Morning
+        } else if (hour >= 12 && hour < 18) {
+            body.style.background = 'linear-gradient(to right, #00c6ff, #0072ff)'; // Afternoon
+        } else if (hour >= 18 && hour < 21) {
+            body.style.background = 'linear-gradient(to right, #ff6a00, #ee0979)'; // Evening
+        } else {
+            body.style.background = 'linear-gradient(to right, #232526, #414345)'; // Night
+        }
+    }
+
+    /**
+     * Starts the clock and updates it every second.
+     */
+    function startClock() {
+        const clock = document.getElementById('clock');
+        setInterval(() => {
+            const now = new Date();
+            clock.innerText = now.toLocaleTimeString(); // Format time
+        }, 1000); // Update every second
+    }
+
+    /**
+     * Fetches city suggestions based on user input.
+     * @param {string} query - The city name query.
+     */
+    function fetchCitySuggestions(query) {
+        const url = `http://api.geonames.org/searchJSON?q=${query}&maxRows=5&username=${geonamesUsername}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.geonames && Array.isArray(data.geonames)) {
+                    displaySuggestions(data.geonames);
+                } else {
+                    console.error('No geonames found in the response:', data);
+                    document.getElementById('suggestions').style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching city suggestions:', error));
+    }
+
+    /**
+     * Displays city suggestions in a dropdown.
+     * @param {Array} cities - List of city objects.
+     */
+    function displaySuggestions(cities) {
+        const suggestionsContainer = document.getElementById('suggestions');
+        suggestionsContainer.innerHTML = '';
+
+        if (cities.length > 0) {
+            suggestionsContainer.style.display = 'block';
+            cities.forEach(city => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerText = city.name + ', ' + city.country;
+                div.onclick = () => selectCity(city.name);
+                suggestionsContainer.appendChild(div);
+            });
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
+    }
+
+    /**
+     * Selects a city from the suggestions and fetches weather data.
+     * @param {string} city - The selected city name.
+     */
+    function selectCity(city) {
+        document.getElementById('city').value = city;
+        document.getElementById('suggestions').style.display = 'none';
+        getWeather(city);
+    }
+
+    /**
+     * Fetches the weather data for a given city.
+     * @param {string} city - The city name.
+     */
+    function getWeather(city) {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+                return response.json();
+            })
+            .then(data => {
+                addWeatherWidget(data);
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    }
+
+    /**
+     * Adds a weather widget with the fetched data.
+     * @param {Object} data - The weather data object.
+     */
+    function addWeatherWidget(data) {
+        const weatherWidgetsContainer = document.getElementById('weatherWidgets');
+        const widget = document.createElement('div');
+        widget.className = 'weather-widget';
+        widget.innerHTML = `
+            <button class="delete-button" onclick="removeWidget(this)">×</button>
+            <div class="weather-icon">${getWeatherIcon(data.weather[0].icon)}</div>
+            <h2>Weather in ${data.name}</h2>
+            <p>Temperature: ${data.main.temp} °C</p>
+            <p>Weather: ${data.weather[0].description}</p>
+        `;
+        weatherWidgetsContainer.appendChild(widget);
+    }
+
+    /**
+     * Removes a weather widget.
+     * @param {HTMLElement} button - The delete button element.
+     */
+    function removeWidget(button) {
+        const widget = button.parentElement;
+        widget.remove();
+    }
+
+    /**
+     * Returns an HTML string for the weather icon.
+     * @param {string} iconCode - The weather icon code.
+     * @return {string} HTML string representing the weather icon.
+     */
+    function getWeatherIcon(iconCode) {
+        const iconMap = {
+            '01d': '<i class="fas fa-sun"></i>', // Clear sky
+            '01n': '<i class="fas fa-moon"></i>', // Clear sky night
+            '02d': '<i class="fas fa-cloud-sun"></i>', // Few clouds
+            '02n': '<i class="fas fa-cloud-moon"></i>', // Few clouds night
+            '03d': '<i class="fas fa-cloud"></i>', // Scattered clouds
+            '03n': '<i class="fas fa-cloud"></i>', // Scattered clouds night
+            '04d': '<i class="fas fa-cloud-meatball"></i>', // Broken clouds
+            '04n': '<i class="fas fa-cloud-meatball"></i>', // Broken clouds night
+            '09d': '<i class="fas fa-cloud-showers-heavy"></i>', // Shower rain
+            '09n': '<i class="fas fa-cloud-showers-heavy"></i>', // Shower rain night
+            '10d': '<i class="fas fa-cloud-rain"></i>', // Rain
+            '10n': '<i class="fas fa-cloud-rain"></i>', // Rain night
+            '11d': '<i class="fas fa-bolt"></i>', // Thunderstorm
+            '11n': '<i class="fas fa-bolt"></i>', // Thunderstorm night
+            '13d': '<i class="fas fa-snowflake"></i>', // Snow
+            '13n': '<i class="fas fa-snowflake"></i>', // Snow night
+            '50d': '<i class="fas fa-smog"></i>', // Mist
+            '50n': '<i class="fas fa-smog"></i>' // Mist night
+        };
+        return iconMap[iconCode] || '<i class="fas fa-question"></i>'; // Default icon if not found
+    }
+    </script>
+</body>
+</html>
