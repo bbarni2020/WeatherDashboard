@@ -4,7 +4,7 @@ A simple web application that allows users to search for weather conditions in d
 
 ## 🌐 Live Demo
 
-You can view a live demo of the website at [https://loading.com].
+You can view a live demo of the website at [Website](https://weather-dashboard-theta-drab.vercel.app/).
 
 ## 🔧 Installation
 
