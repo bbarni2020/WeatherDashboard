@@ -27,7 +27,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 🙌 Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request.
+Contributions are welcome! Please fork the repository and submit a pull request. I use AI to clean up and format my code for better readability.
 
 ## 👨‍💻 Authors
 
